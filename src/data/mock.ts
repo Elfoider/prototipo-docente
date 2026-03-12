@@ -27,16 +27,16 @@ export const quickActions: QuickAction[] = [
   {
     title: "Registrar asignatura",
     description: "Crea una nueva asignatura para este período.",
-    href: "#",
+    href: "/asignaturas",
+  },
+  {
+    title: "Gestionar secciones",
+    description: "Administra las secciones asociadas a tus asignaturas.",
+    href: "/secciones",
   },
   {
     title: "Crear planificación",
     description: "Organiza contenidos y actividades académicas.",
-    href: "#",
-  },
-  {
-    title: "Registrar evaluación",
-    description: "Añade una evaluación con fecha y ponderación.",
     href: "#",
   },
   {
