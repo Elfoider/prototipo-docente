@@ -27,3 +27,24 @@ export interface Section {
   classroom: string;
   capacity: number;
 }
+
+export interface Planning {
+  id: string;
+  subjectId: string;
+  sectionId: string;
+  title: string;
+  objective: string;
+  content: string;
+  date: string;
+}
+
+export interface Evaluation {
+  id: string;
+  subjectId: string;
+  sectionId: string;
+  title: string;
+  type: string;
+  percentage: number;
+  date: string;
+  description: string;
+}

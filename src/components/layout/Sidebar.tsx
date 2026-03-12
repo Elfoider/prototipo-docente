@@ -7,8 +7,8 @@ const menuItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Asignaturas", href: "/asignaturas" },
   { label: "Secciones", href: "/secciones" },
-  { label: "Planificación", href: "#" },
-  { label: "Evaluaciones", href: "#" },
+  { label: "Planificación", href: "/planificacion" },
+  { label: "Evaluaciones", href: "/evaluaciones" },
   { label: "Estudiantes", href: "#" },
   { label: "Asistente", href: "#" },
 ];
