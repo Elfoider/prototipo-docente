@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Subject } from "@/types";
@@ -47,7 +48,7 @@ export default function SubjectForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm"
     >
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
@@ -69,7 +70,7 @@ export default function SubjectForm({
             onChange={(e) =>
               setFormData({ ...formData, name: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Ej. Ingeniería de Software"
             required
           />
@@ -85,7 +86,7 @@ export default function SubjectForm({
             onChange={(e) =>
               setFormData({ ...formData, code: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Ej. INF-401"
             required
           />
@@ -101,7 +102,7 @@ export default function SubjectForm({
             onChange={(e) =>
               setFormData({ ...formData, period: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Ej. 2026-I"
             required
           />
@@ -116,7 +117,7 @@ export default function SubjectForm({
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            className="min-h-[120px] w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="min-h-[120px] w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Descripción general de la asignatura"
             required
           />
@@ -126,7 +127,7 @@ export default function SubjectForm({
       <div className="mt-6 flex gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-gray-900 px-5 py-3 font-semibold text-white hover:bg-gray-800"
+          className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 font-semibold text-white shadow-md hover:from-blue-700 hover:to-violet-700"
         >
           {editingSubject ? "Guardar cambios" : "Registrar asignatura"}
         </button>
@@ -135,7 +136,7 @@ export default function SubjectForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-xl border border-gray-300 px-5 py-3 font-medium text-gray-700 hover:bg-gray-100"
+            className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancelar
           </button>

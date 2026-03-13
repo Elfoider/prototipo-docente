@@ -1,7 +1,7 @@
 "use client";
 
 import { Subject } from "@/types";
-
+import EmptyState from "@/components/ui/EmptyState";
 interface SubjectListProps {
   subjects: Subject[];
   onEdit: (subject: Subject) => void;
@@ -25,15 +25,16 @@ export default function SubjectList({
       </div>
 
       {subjects.length === 0 ? (
-        <p className="text-sm text-gray-500">
-          Aún no hay asignaturas registradas.
-        </p>
+        <EmptyState
+          title="Sin registros"
+          description="Todavía no hay elementos registrados en este módulo."
+        />
       ) : (
         <div className="space-y-4">
           {subjects.map((subject) => (
             <div
               key={subject.id}
-              className="rounded-xl border border-gray-200 p-4"
+              className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
@@ -51,13 +52,13 @@ export default function SubjectList({
                 <div className="flex gap-2">
                   <button
                     onClick={() => onEdit(subject)}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                    className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                   >
                     Editar
                   </button>
                   <button
                     onClick={() => onDelete(subject.id)}
-                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    className="rounded-xl bg-gradient-to-r from-rose-500 to-red-600 px-4 py-2 text-sm font-medium text-white hover:from-rose-600 hover:to-red-700"
                   >
                     Eliminar
                   </button>

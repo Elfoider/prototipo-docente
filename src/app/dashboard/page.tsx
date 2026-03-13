@@ -2,18 +2,13 @@
 
 import { useMemo } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import StatCard from "@/components/ui/StatCard";
-import QuickActionCard from "@/components/ui/QuickActionCard";
-import { quickActions } from "@/data/mock";
+import SectionTitle from "@/components/ui/SectionTitle";
+import HeroBanner from "@/components/dashboard/HeroBanner";
+import ModuleCard from "@/components/dashboard/ModuleCard";
+import ProgressPanel from "@/components/dashboard/ProgressPanel";
+import UpcomingPanel from "@/components/dashboard/UpcomingPanel";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import {
-  Evaluation,
-  Planning,
-  Section,
-  Student,
-  Subject,
-  Stat,
-} from "@/types";
+import { Evaluation, Planning, Section, Student, Subject } from "@/types";
 
 export default function DashboardPage() {
   const [subjects, , subjectsLoaded] = useLocalStorage<Subject[]>("subjects", []);
@@ -25,32 +20,6 @@ export default function DashboardPage() {
     []
   );
 
-  const stats: Stat[] = useMemo(
-    () => [
-      {
-        title: "Asignaturas activas",
-        value: String(subjects.length),
-        description: "Materias registradas en el período actual",
-      },
-      {
-        title: "Secciones",
-        value: String(sections.length),
-        description: "Secciones asignadas al docente",
-      },
-      {
-        title: "Estudiantes",
-        value: String(students.length),
-        description: "Total de estudiantes registrados",
-      },
-      {
-        title: "Actividades académicas",
-        value: String(plannings.length + evaluations.length),
-        description: "Planificaciones y evaluaciones creadas",
-      },
-    ],
-    [subjects.length, sections.length, students.length, plannings.length, evaluations.length]
-  );
-
   const loaded =
     subjectsLoaded &&
     sectionsLoaded &&
@@ -58,42 +27,99 @@ export default function DashboardPage() {
     planningsLoaded &&
     evaluationsLoaded;
 
+  const modules = useMemo(
+    () => [
+      {
+        title: "Asignaturas",
+        description: "Administra materias, unidades curriculares y organización docente.",
+        href: "/asignaturas",
+        tone: "blue" as const,
+        tag: `${subjects.length} registradas`,
+      },
+      {
+        title: "Secciones",
+        description: "Asocia grupos, horarios, modalidades y capacidad académica.",
+        href: "/secciones",
+        tone: "violet" as const,
+        tag: `${sections.length} activas`,
+      },
+      {
+        title: "Planificación",
+        description: "Organiza objetivos, contenidos y fechas por asignatura y sección.",
+        href: "/planificacion",
+        tone: "green" as const,
+        tag: `${plannings.length} creadas`,
+      },
+      {
+        title: "Evaluaciones",
+        description: "Gestiona actividades evaluativas, ponderaciones y cronogramas.",
+        href: "/evaluaciones",
+        tone: "amber" as const,
+        tag: `${evaluations.length} registradas`,
+      },
+      {
+        title: "Estudiantes",
+        description: "Consulta y organiza estudiantes asociados a cada sección.",
+        href: "/estudiantes",
+        tone: "cyan" as const,
+        tag: `${students.length} registrados`,
+      },
+      {
+        title: "Asistente IA",
+        description: "Genera textos académicos y apoyo inteligente para la gestión docente.",
+        href: "/asistente",
+        tone: "violet" as const,
+        tag: "Inteligente",
+      },
+    ],
+    [subjects.length, sections.length, plannings.length, evaluations.length, students.length]
+  );
+
   if (!loaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando dashboard...</p>
+        <p className="text-sm text-slate-500">Cargando dashboard...</p>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <section>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Bienvenido, docente
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Administra tus asignaturas, planificación, evaluaciones y estudiantes
-            desde un solo lugar.
-          </p>
-        </div>
+      <section className="space-y-8">
+        <SectionTitle
+          title="Panel principal"
+          description="Entorno visual de gestión académica pensado para docentes y preparado para crecer hacia una experiencia completa para estudiantes."
+        />
 
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <StatCard key={stat.title} stat={stat} />
-          ))}
-        </div>
+        <HeroBanner />
 
-        <div className="mt-10">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-900">
-            Accesos rápidos
+        <div>
+          <h2 className="mb-4 text-2xl font-semibold text-slate-900">
+            Módulos del sistema
           </h2>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {quickActions.map((action) => (
-              <QuickActionCard key={action.title} action={action} />
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {modules.map((module) => (
+              <ModuleCard
+                key={module.title}
+                title={module.title}
+                description={module.description}
+                href={module.href}
+                tone={module.tone}
+                tag={module.tag}
+              />
             ))}
           </div>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <ProgressPanel
+            subjects={subjects.length}
+            sections={sections.length}
+            students={students.length}
+            plannings={plannings.length}
+            evaluations={evaluations.length}
+          />
+          <UpcomingPanel />
         </div>
       </section>
     </DashboardLayout>

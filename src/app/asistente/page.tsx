@@ -4,7 +4,7 @@ import AssistantPanel from "@/components/asistente/AssistantPanel";
 export default function AssistantPage() {
   return (
     <DashboardLayout>
-      <section className="space-y-6">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             Asistente inteligente

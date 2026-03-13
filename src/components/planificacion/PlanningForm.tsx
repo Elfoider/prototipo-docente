@@ -59,7 +59,7 @@ export default function PlanningForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      
     >
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
@@ -84,7 +84,7 @@ export default function PlanningForm({
                 sectionId: "",
               })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             required
           >
             <option value="">Selecciona una asignatura</option>
@@ -105,7 +105,7 @@ export default function PlanningForm({
             onChange={(e) =>
               setFormData({ ...formData, sectionId: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             required
           >
             <option value="">Selecciona una sección</option>
@@ -127,7 +127,7 @@ export default function PlanningForm({
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Ej. Unidad I - Introducción al desarrollo web"
             required
           />
@@ -157,7 +157,7 @@ export default function PlanningForm({
             onChange={(e) =>
               setFormData({ ...formData, content: e.target.value })
             }
-            className="min-h-[120px] w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="min-h-[120px] w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             placeholder="Describe el contenido a desarrollar"
             required
           />
@@ -173,7 +173,7 @@ export default function PlanningForm({
             onChange={(e) =>
               setFormData({ ...formData, date: e.target.value })
             }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
             required
           />
         </div>
@@ -182,7 +182,7 @@ export default function PlanningForm({
       <div className="mt-6 flex gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-gray-900 px-5 py-3 font-semibold text-white hover:bg-gray-800"
+          className="rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 font-semibold text-white shadow-md hover:from-blue-700 hover:to-violet-700"
         >
           {editingPlanning ? "Guardar cambios" : "Registrar planificación"}
         </button>
@@ -191,7 +191,7 @@ export default function PlanningForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-xl border border-gray-300 px-5 py-3 font-medium text-gray-700 hover:bg-gray-100"
+            className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancelar
           </button>

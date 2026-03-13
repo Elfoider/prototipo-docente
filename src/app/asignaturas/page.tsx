@@ -4,8 +4,11 @@ import { useMemo, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import SubjectForm from "@/components/asignaturas/SubjectForm";
 import SubjectList from "@/components/asignaturas/SubjectList";
+import SearchInput from "@/components/ui/SearchInput";
+import Alert from "@/components/ui/Alert";
 import { Subject } from "@/types";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useAlert } from "@/hooks/useAlert";
 
 export default function SubjectsPage() {
   const [subjects, setSubjects, isLoaded] = useLocalStorage<Subject[]>(
@@ -13,6 +16,19 @@ export default function SubjectsPage() {
     []
   );
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
+  const [search, setSearch] = useState("");
+  const { alert, showAlert } = useAlert();
+
+  const filteredSubjects = useMemo(() => {
+    const term = search.toLowerCase().trim();
+
+    return subjects.filter(
+      (subject) =>
+        subject.name.toLowerCase().includes(term) ||
+        subject.code.toLowerCase().includes(term) ||
+        subject.period.toLowerCase().includes(term)
+    );
+  }, [subjects, search]);
 
   const totalSubjects = useMemo(() => subjects.length, [subjects]);
 
@@ -23,8 +39,10 @@ export default function SubjectsPage() {
       setSubjects(
         subjects.map((item) => (item.id === subject.id ? subject : item))
       );
+      showAlert("Asignatura actualizada correctamente.", "success");
     } else {
       setSubjects([...subjects, subject]);
+      showAlert("Asignatura registrada correctamente.", "success");
     }
 
     setEditingSubject(null);
@@ -38,6 +56,8 @@ export default function SubjectsPage() {
     if (!confirmed) return;
 
     setSubjects(subjects.filter((item) => item.id !== id));
+    showAlert("Asignatura eliminada correctamente.", "info");
+
     if (editingSubject?.id === id) {
       setEditingSubject(null);
     }
@@ -53,7 +73,7 @@ export default function SubjectsPage() {
 
   return (
     <DashboardLayout>
-      <section className="space-y-6">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Asignaturas</h1>
           <p className="mt-2 text-gray-600">
@@ -64,6 +84,14 @@ export default function SubjectsPage() {
           </p>
         </div>
 
+        {alert && <Alert message={alert.message} type={alert.type} />}
+
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar por nombre, código o período..."
+        />
+
         <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
           <SubjectForm
             onSubmit={handleSaveSubject}
@@ -72,7 +100,7 @@ export default function SubjectsPage() {
           />
 
           <SubjectList
-            subjects={subjects}
+            subjects={filteredSubjects}
             onEdit={setEditingSubject}
             onDelete={handleDeleteSubject}
           />
