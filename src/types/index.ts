@@ -48,3 +48,12 @@ export interface Evaluation {
   date: string;
   description: string;
 }
+
+export interface Student {
+  id: string;
+  subjectId: string;
+  sectionId: string;
+  fullName: string;
+  idNumber: string;
+  email: string;
+}

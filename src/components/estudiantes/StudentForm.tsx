@@ -1,44 +1,42 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { Evaluation, Section, Subject } from "@/types";
+import { Section, Student, Subject } from "@/types";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-interface EvaluationFormProps {
+interface StudentFormProps {
   subjects: Subject[];
   sections: Section[];
-  onSubmit: (evaluation: Evaluation) => void;
-  editingEvaluation: Evaluation | null;
+  onSubmit: (student: Student) => void;
+  editingStudent: Student | null;
   onCancelEdit: () => void;
 }
 
-const initialForm: Evaluation = {
+const initialForm: Student = {
   id: "",
   subjectId: "",
   sectionId: "",
-  title: "",
-  type: "",
-  percentage: 0,
-  date: "",
-  description: "",
+  fullName: "",
+  idNumber: "",
+  email: "",
 };
 
-export default function EvaluationForm({
+export default function StudentForm({
   subjects,
   sections,
   onSubmit,
-  editingEvaluation,
+  editingStudent,
   onCancelEdit,
-}: EvaluationFormProps) {
-  const [formData, setFormData] = useState<Evaluation>(initialForm);
+}: StudentFormProps) {
+  const [formData, setFormData] = useState<Student>(initialForm);
 
   useEffect(() => {
-    if (editingEvaluation) {
-      setFormData(editingEvaluation);
+    if (editingStudent) {
+      setFormData(editingStudent);
     } else {
       setFormData(initialForm);
     }
-  }, [editingEvaluation]);
+  }, [editingStudent]);
 
   const filteredSections = useMemo(() => {
     if (!formData.subjectId) return [];
@@ -48,13 +46,12 @@ export default function EvaluationForm({
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const evaluationToSave: Evaluation = {
+    const studentToSave: Student = {
       ...formData,
       id: formData.id || crypto.randomUUID(),
-      percentage: Number(formData.percentage),
     };
 
-    onSubmit(evaluationToSave);
+    onSubmit(studentToSave);
     setFormData(initialForm);
   };
 
@@ -65,10 +62,10 @@ export default function EvaluationForm({
     >
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          {editingEvaluation ? "Editar evaluación" : "Registrar evaluación"}
+          {editingStudent ? "Editar estudiante" : "Registrar estudiante"}
         </h2>
         <p className="mt-1 text-sm text-gray-600">
-          Registra evaluaciones por asignatura y sección.
+          Asocia estudiantes a una asignatura y sección.
         </p>
       </div>
 
@@ -121,85 +118,48 @@ export default function EvaluationForm({
 
         <div className="md:col-span-2">
           <label className="mb-2 block text-sm font-medium text-gray-700">
-            Título de la evaluación
+            Nombre completo
           </label>
           <input
             type="text"
-            value={formData.title}
+            value={formData.fullName}
             onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
+              setFormData({ ...formData, fullName: e.target.value })
             }
             className="w-full rounded-xl border border-gray-300 px-4 py-3"
-            placeholder="Ej. Parcial I"
+            placeholder="Ej. María Fernanda Pérez"
             required
           />
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
-            Tipo
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value })
-            }
-            className="w-full rounded-xl border border-gray-300 px-4 py-3"
-            required
-          >
-            <option value="">Selecciona un tipo</option>
-            <option value="Examen">Examen</option>
-            <option value="Quiz">Quiz</option>
-            <option value="Taller">Taller</option>
-            <option value="Exposición">Exposición</option>
-            <option value="Proyecto">Proyecto</option>
-            <option value="Práctica">Práctica</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Ponderación (%)
+            Cédula
           </label>
           <input
-            type="number"
-            value={formData.percentage}
+            type="text"
+            value={formData.idNumber}
             onChange={(e) =>
-              setFormData({ ...formData, percentage: Number(e.target.value) })
+              setFormData({ ...formData, idNumber: e.target.value })
             }
             className="w-full rounded-xl border border-gray-300 px-4 py-3"
-            min="1"
-            max="100"
+            placeholder="Ej. V-12345678"
             required
           />
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
-            Fecha
+            Correo
           </label>
           <input
-            type="date"
-            value={formData.date}
+            type="email"
+            value={formData.email}
             onChange={(e) =>
-              setFormData({ ...formData, date: e.target.value })
+              setFormData({ ...formData, email: e.target.value })
             }
             className="w-full rounded-xl border border-gray-300 px-4 py-3"
-            required
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Descripción
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="min-h-[120px] w-full rounded-xl border border-gray-300 px-4 py-3"
-            placeholder="Describe la evaluación"
+            placeholder="ejemplo@correo.com"
             required
           />
         </div>
@@ -210,10 +170,10 @@ export default function EvaluationForm({
           type="submit"
           className="rounded-xl bg-gray-900 px-5 py-3 font-semibold text-white hover:bg-gray-800"
         >
-          {editingEvaluation ? "Guardar cambios" : "Registrar evaluación"}
+          {editingStudent ? "Guardar cambios" : "Registrar estudiante"}
         </button>
 
-        {editingEvaluation && (
+        {editingStudent && (
           <button
             type="button"
             onClick={onCancelEdit}

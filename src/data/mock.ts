@@ -35,13 +35,13 @@ export const quickActions: QuickAction[] = [
     href: "/secciones",
   },
   {
-    title: "Crear planificación",
-    description: "Organiza contenidos y actividades académicas.",
-    href: "/planificacion",
+    title: "Registrar estudiante",
+    description: "Asocia estudiantes a una asignatura y sección.",
+    href: "/estudiantes",
   },
   {
-    title: "Registrar evaluación",
-    description: "Crea evaluaciones con fecha y ponderación.",
-    href: "/evaluaciones",
+    title: "Usar asistente",
+    description: "Genera anuncios, actividades o instrucciones.",
+    href: "/asistente",
   },
 ];

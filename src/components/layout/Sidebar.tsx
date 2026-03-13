@@ -9,8 +9,8 @@ const menuItems = [
   { label: "Secciones", href: "/secciones" },
   { label: "Planificación", href: "/planificacion" },
   { label: "Evaluaciones", href: "/evaluaciones" },
-  { label: "Estudiantes", href: "#" },
-  { label: "Asistente", href: "#" },
+  { label: "Estudiantes", href: "/estudiantes" },
+  { label: "Asistente", href: "/asistente" },
 ];
 
 export default function Sidebar() {
