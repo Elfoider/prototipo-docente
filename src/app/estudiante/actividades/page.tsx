@@ -1,5 +1,6 @@
 import StudentLayout from "@/components/layout/StudentLayout";
 import ActivityCard from "@/components/estudiante/ActivityCard";
+import AssignmentSubmitCard from "@/components/estudiante/AssignmentSubmitCard";
 
 const activities = [
   {
@@ -38,6 +39,8 @@ export default function StudentActivitiesPage() {
             <ActivityCard key={item.title} {...item} />
           ))}
         </div>
+
+        <AssignmentSubmitCard />
       </section>
     </StudentLayout>
   );

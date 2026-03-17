@@ -2,6 +2,8 @@ import StudentLayout from "@/components/layout/StudentLayout";
 import StudentHero from "@/components/estudiante/StudentHero";
 import SubjectStudentCard from "@/components/estudiante/SubjectStudentCard";
 import SubjectTabs from "@/components/estudiante/SubjectTabs";
+import SubjectProgressCard from "@/components/estudiante/SubjectProgressCard";
+import CalendarMini from "@/components/ui/CalendarMini";
 
 const subjects = [
   {
@@ -41,7 +43,28 @@ export default function StudentDashboardPage() {
           </div>
         </div>
 
-        <SubjectTabs />
+        <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+          <SubjectTabs />
+          <CalendarMini />
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <SubjectProgressCard
+            title="Ingeniería de Software"
+            completed={8}
+            total={11}
+          />
+          <SubjectProgressCard
+            title="Bases de Datos"
+            completed={5}
+            total={9}
+          />
+          <SubjectProgressCard
+            title="Programación Web"
+            completed={9}
+            total={11}
+          />
+        </div>
       </section>
     </StudentLayout>
   );

@@ -1,5 +1,6 @@
 import StudentLayout from "@/components/layout/StudentLayout";
 import VirtualClassRoom from "@/components/estudiante/VirtualClassRoom";
+import MiniChatPanel from "@/components/estudiante/MiniChatPanel";
 
 export default function StudentClassesPage() {
   return (
@@ -12,7 +13,10 @@ export default function StudentClassesPage() {
           </p>
         </div>
 
-        <VirtualClassRoom />
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <VirtualClassRoom />
+          <MiniChatPanel />
+        </div>
       </section>
     </StudentLayout>
   );
