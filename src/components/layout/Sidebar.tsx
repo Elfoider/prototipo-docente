@@ -13,6 +13,7 @@ const menuItems = [
   { label: "Estudiantes", href: "/estudiantes" },
   { label: "Asistente", href: "/asistente" },
   { label: "Resumen", href: "/resumen" },
+  { label: "Portal", href: "/portal" },
 ];
 
 export default function Sidebar() {

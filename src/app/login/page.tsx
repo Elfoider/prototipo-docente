@@ -8,7 +8,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push("/dashboard");
+    router.push("/portal");
   };
 
   return (
