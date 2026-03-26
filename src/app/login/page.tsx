@@ -1,14 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import RoleSelector from "@/components/auth/RoleSelector";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [role, setRole] = useState<"docente" | "estudiante">("docente");
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push("/portal");
+
+    if (role === "docente") {
+      router.push("/dashboard");
+    } else {
+      router.push("/estudiante/dashboard");
+    }
   };
 
   return (
@@ -25,18 +32,17 @@ export default function LoginPage() {
             </h1>
 
             <p className="mt-5 max-w-md text-sm leading-7 text-blue-50">
-              Sistema bajo ambiente web para apoyo en la gestión académica de
-              docentes universitarios, con visión escalable hacia experiencia
-              docente y estudiantil.
+              Plataforma académica inteligente con entorno diferenciado para
+              docentes y estudiantes.
             </p>
           </div>
 
           <div className="space-y-3 text-sm text-blue-50/90">
             <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-              Gestión de asignaturas, secciones y planificación académica
+              Gestión docente, clases en línea, evaluaciones y planificación
             </div>
             <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-              Evaluaciones, estudiantes y asistencia inteligente
+              Experiencia estudiantil, actividades y playground académico
             </div>
           </div>
         </div>
@@ -50,18 +56,25 @@ export default function LoginPage() {
               Iniciar sesión
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Accede al entorno académico inteligente.
+              Accede a tu entorno académico.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">
+                Tipo de acceso
+              </label>
+              <RoleSelector selectedRole={role} onChange={setRole} />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Correo institucional
               </label>
               <input
                 type="email"
-                placeholder="docente@universidad.edu"
+                placeholder="usuario@universidad.edu"
                 className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
                 required
               />
@@ -81,9 +94,13 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] hover:from-blue-700 hover:to-violet-700"
+              className={`w-full rounded-2xl px-4 py-3 font-semibold text-white shadow-lg transition ${
+                role === "docente"
+                  ? "bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700"
+                  : "bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600"
+              }`}
             >
-              Ingresar al sistema
+              Ingresar como {role}
             </button>
           </form>
         </div>

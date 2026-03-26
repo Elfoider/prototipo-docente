@@ -7,14 +7,18 @@ import SubjectList from "@/components/asignaturas/SubjectList";
 import SearchInput from "@/components/ui/SearchInput";
 import Alert from "@/components/ui/Alert";
 import { Subject } from "@/types";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useAlert } from "@/hooks/useAlert";
+import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
+import { COLLECTIONS } from "@/lib/collections";
 
 export default function SubjectsPage() {
-  const [subjects, setSubjects, isLoaded] = useLocalStorage<Subject[]>(
-    "subjects",
-    []
-  );
+  const {
+    items: subjects,
+    isLoaded,
+    saveItem,
+    removeItem,
+  } = useFirestoreCollection<Subject>(COLLECTIONS.subjects);
+
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [search, setSearch] = useState("");
   const { alert, showAlert } = useAlert();
@@ -30,32 +34,34 @@ export default function SubjectsPage() {
     );
   }, [subjects, search]);
 
-  const totalSubjects = useMemo(() => subjects.length, [subjects]);
+  const handleSaveSubject = async (subject: Subject) => {
+    const subjectToSave: Subject = {
+      ...subject,
+      id: subject.id || crypto.randomUUID(),
+      createdAt: subject.createdAt || Date.now(),
+    };
 
-  const handleSaveSubject = (subject: Subject) => {
-    const exists = subjects.some((item) => item.id === subject.id);
+    const exists = subjects.some((item) => item.id === subjectToSave.id);
 
-    if (exists) {
-      setSubjects(
-        subjects.map((item) => (item.id === subject.id ? subject : item))
-      );
-      showAlert("Asignatura actualizada correctamente.", "success");
-    } else {
-      setSubjects([...subjects, subject]);
-      showAlert("Asignatura registrada correctamente.", "success");
-    }
+    await saveItem(subjectToSave);
+
+    showAlert(
+      exists
+        ? "Asignatura actualizada correctamente."
+        : "Asignatura registrada correctamente.",
+      "success"
+    );
 
     setEditingSubject(null);
   };
 
-  const handleDeleteSubject = (id: string) => {
+  const handleDeleteSubject = async (id: string) => {
     const confirmed = window.confirm(
       "¿Seguro que deseas eliminar esta asignatura?"
     );
-
     if (!confirmed) return;
 
-    setSubjects(subjects.filter((item) => item.id !== id));
+    await removeItem(id);
     showAlert("Asignatura eliminada correctamente.", "info");
 
     if (editingSubject?.id === id) {
@@ -66,21 +72,21 @@ export default function SubjectsPage() {
   if (!isLoaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando asignaturas...</p>
+        <p className="text-sm text-slate-500">Cargando asignaturas...</p>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Asignaturas</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-900">Asignaturas</h1>
+          <p className="mt-2 text-slate-600">
             Registra y administra las asignaturas del período académico.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Total registradas: {totalSubjects}
+          <p className="mt-3 text-sm text-slate-500">
+            Total registradas: {subjects.length}
           </p>
         </div>
 

@@ -6,16 +6,24 @@ import SectionForm from "@/components/secciones/SectionForm";
 import SectionList from "@/components/secciones/SectionList";
 import SearchInput from "@/components/ui/SearchInput";
 import Alert from "@/components/ui/Alert";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useAlert } from "@/hooks/useAlert";
+import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
+import { COLLECTIONS } from "@/lib/collections";
 import { Section, Subject } from "@/types";
 
 export default function SectionsPage() {
-  const [subjects, , subjectsLoaded] = useLocalStorage<Subject[]>("subjects", []);
-  const [sections, setSections, sectionsLoaded] = useLocalStorage<Section[]>(
-    "sections",
-    []
-  );
+  const {
+    items: subjects,
+    isLoaded: subjectsLoaded,
+  } = useFirestoreCollection<Subject>(COLLECTIONS.subjects);
+
+  const {
+    items: sections,
+    isLoaded: sectionsLoaded,
+    saveItem,
+    removeItem,
+  } = useFirestoreCollection<Section>(COLLECTIONS.sections);
+
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [search, setSearch] = useState("");
   const { alert, showAlert } = useAlert();
@@ -36,32 +44,34 @@ export default function SectionsPage() {
     });
   }, [sections, subjects, search]);
 
-  const totalSections = useMemo(() => sections.length, [sections]);
+  const handleSaveSection = async (section: Section) => {
+    const sectionToSave: Section = {
+      ...section,
+      id: section.id || crypto.randomUUID(),
+      createdAt: section.createdAt || Date.now(),
+    };
 
-  const handleSaveSection = (section: Section) => {
-    const exists = sections.some((item) => item.id === section.id);
+    const exists = sections.some((item) => item.id === sectionToSave.id);
 
-    if (exists) {
-      setSections(
-        sections.map((item) => (item.id === section.id ? section : item))
-      );
-      showAlert("Sección actualizada correctamente.", "success");
-    } else {
-      setSections([...sections, section]);
-      showAlert("Sección registrada correctamente.", "success");
-    }
+    await saveItem(sectionToSave);
+
+    showAlert(
+      exists
+        ? "Sección actualizada correctamente."
+        : "Sección registrada correctamente.",
+      "success"
+    );
 
     setEditingSection(null);
   };
 
-  const handleDeleteSection = (id: string) => {
+  const handleDeleteSection = async (id: string) => {
     const confirmed = window.confirm(
       "¿Seguro que deseas eliminar esta sección?"
     );
-
     if (!confirmed) return;
 
-    setSections(sections.filter((item) => item.id !== id));
+    await removeItem(id);
     showAlert("Sección eliminada correctamente.", "info");
 
     if (editingSection?.id === id) {
@@ -72,21 +82,21 @@ export default function SectionsPage() {
   if (!subjectsLoaded || !sectionsLoaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando secciones...</p>
+        <p className="text-sm text-slate-500">Cargando secciones...</p>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Secciones</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-900">Secciones</h1>
+          <p className="mt-2 text-slate-600">
             Registra y organiza las secciones asociadas a cada asignatura.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Total registradas: {totalSections}
+          <p className="mt-3 text-sm text-slate-500">
+            Total registradas: {sections.length}
           </p>
         </div>
 
@@ -99,7 +109,7 @@ export default function SectionsPage() {
             </h2>
             <p className="mt-2 text-sm text-yellow-800">
               Para registrar secciones, antes necesitas crear al menos una
-              asignatura en el módulo de asignaturas.
+              asignatura.
             </p>
           </div>
         ) : (

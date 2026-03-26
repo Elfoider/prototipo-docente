@@ -1,45 +1,63 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import EvaluationForm from "@/components/evaluaciones/EvaluationForm";
 import EvaluationList from "@/components/evaluaciones/EvaluationList";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import Alert from "@/components/ui/Alert";
+import { useAlert } from "@/hooks/useAlert";
+import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
+import { COLLECTIONS } from "@/lib/collections";
 import { Evaluation, Section, Subject } from "@/types";
 
 export default function EvaluationsPage() {
-  const [subjects, , subjectsLoaded] = useLocalStorage<Subject[]>("subjects", []);
-  const [sections, , sectionsLoaded] = useLocalStorage<Section[]>("sections", []);
-  const [evaluations, setEvaluations, evaluationsLoaded] = useLocalStorage<Evaluation[]>(
-    "evaluations",
-    []
-  );
-  const [editingEvaluation, setEditingEvaluation] = useState<Evaluation | null>(null);
+  const { items: subjects, isLoaded: subjectsLoaded } =
+    useFirestoreCollection<Subject>(COLLECTIONS.subjects);
 
-  const totalEvaluations = useMemo(() => evaluations.length, [evaluations]);
+  const { items: sections, isLoaded: sectionsLoaded } =
+    useFirestoreCollection<Section>(COLLECTIONS.sections);
 
-  const handleSaveEvaluation = (evaluation: Evaluation) => {
-    const exists = evaluations.some((item) => item.id === evaluation.id);
+  const {
+    items: evaluations,
+    isLoaded: evaluationsLoaded,
+    saveItem,
+    removeItem,
+  } = useFirestoreCollection<Evaluation>(COLLECTIONS.evaluations);
 
-    if (exists) {
-      setEvaluations(
-        evaluations.map((item) => (item.id === evaluation.id ? evaluation : item))
-      );
-    } else {
-      setEvaluations([...evaluations, evaluation]);
-    }
+  const [editingEvaluation, setEditingEvaluation] =
+    useState<Evaluation | null>(null);
+  const { alert, showAlert } = useAlert();
+
+  const handleSaveEvaluation = async (evaluation: Evaluation) => {
+    const evaluationToSave: Evaluation = {
+      ...evaluation,
+      id: evaluation.id || crypto.randomUUID(),
+      createdAt: evaluation.createdAt || Date.now(),
+    };
+
+    const exists = evaluations.some((item) => item.id === evaluationToSave.id);
+
+    await saveItem(evaluationToSave);
+
+    showAlert(
+      exists
+        ? "Evaluación actualizada correctamente."
+        : "Evaluación registrada correctamente.",
+      "success"
+    );
 
     setEditingEvaluation(null);
   };
 
-  const handleDeleteEvaluation = (id: string) => {
+  const handleDeleteEvaluation = async (id: string) => {
     const confirmed = window.confirm(
       "¿Seguro que deseas eliminar esta evaluación?"
     );
-
     if (!confirmed) return;
 
-    setEvaluations(evaluations.filter((item) => item.id !== id));
+    await removeItem(id);
+    showAlert("Evaluación eliminada correctamente.", "info");
+
     if (editingEvaluation?.id === id) {
       setEditingEvaluation(null);
     }
@@ -48,7 +66,7 @@ export default function EvaluationsPage() {
   if (!subjectsLoaded || !sectionsLoaded || !evaluationsLoaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando evaluaciones...</p>
+        <p className="text-sm text-slate-500">Cargando evaluaciones...</p>
       </DashboardLayout>
     );
   }
@@ -71,16 +89,18 @@ export default function EvaluationsPage() {
 
   return (
     <DashboardLayout>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Evaluaciones</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-900">Evaluaciones</h1>
+          <p className="mt-2 text-slate-600">
             Registra evaluaciones con tipo, ponderación y fecha.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Total registradas: {totalEvaluations}
+          <p className="mt-3 text-sm text-slate-500">
+            Total registradas: {evaluations.length}
           </p>
         </div>
+
+        {alert && <Alert message={alert.message} type={alert.type} />}
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
           <EvaluationForm

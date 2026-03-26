@@ -1,45 +1,62 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import StudentForm from "@/components/estudiantes/StudentForm";
 import StudentList from "@/components/estudiantes/StudentList";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import Alert from "@/components/ui/Alert";
+import { useAlert } from "@/hooks/useAlert";
+import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
+import { COLLECTIONS } from "@/lib/collections";
 import { Section, Student, Subject } from "@/types";
 
 export default function StudentsPage() {
-  const [subjects, , subjectsLoaded] = useLocalStorage<Subject[]>("subjects", []);
-  const [sections, , sectionsLoaded] = useLocalStorage<Section[]>("sections", []);
-  const [students, setStudents, studentsLoaded] = useLocalStorage<Student[]>(
-    "students",
-    []
-  );
+  const { items: subjects, isLoaded: subjectsLoaded } =
+    useFirestoreCollection<Subject>(COLLECTIONS.subjects);
+
+  const { items: sections, isLoaded: sectionsLoaded } =
+    useFirestoreCollection<Section>(COLLECTIONS.sections);
+
+  const {
+    items: students,
+    isLoaded: studentsLoaded,
+    saveItem,
+    removeItem,
+  } = useFirestoreCollection<Student>(COLLECTIONS.students);
+
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const { alert, showAlert } = useAlert();
 
-  const totalStudents = useMemo(() => students.length, [students]);
+  const handleSaveStudent = async (student: Student) => {
+    const studentToSave: Student = {
+      ...student,
+      id: student.id || crypto.randomUUID(),
+      createdAt: student.createdAt || Date.now(),
+    };
 
-  const handleSaveStudent = (student: Student) => {
-    const exists = students.some((item) => item.id === student.id);
+    const exists = students.some((item) => item.id === studentToSave.id);
 
-    if (exists) {
-      setStudents(
-        students.map((item) => (item.id === student.id ? student : item))
-      );
-    } else {
-      setStudents([...students, student]);
-    }
+    await saveItem(studentToSave);
+
+    showAlert(
+      exists
+        ? "Estudiante actualizado correctamente."
+        : "Estudiante registrado correctamente.",
+      "success"
+    );
 
     setEditingStudent(null);
   };
 
-  const handleDeleteStudent = (id: string) => {
+  const handleDeleteStudent = async (id: string) => {
     const confirmed = window.confirm(
       "¿Seguro que deseas eliminar este estudiante?"
     );
-
     if (!confirmed) return;
 
-    setStudents(students.filter((item) => item.id !== id));
+    await removeItem(id);
+    showAlert("Estudiante eliminado correctamente.", "info");
+
     if (editingStudent?.id === id) {
       setEditingStudent(null);
     }
@@ -48,7 +65,7 @@ export default function StudentsPage() {
   if (!subjectsLoaded || !sectionsLoaded || !studentsLoaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando estudiantes...</p>
+        <p className="text-sm text-slate-500">Cargando estudiantes...</p>
       </DashboardLayout>
     );
   }
@@ -71,16 +88,18 @@ export default function StudentsPage() {
 
   return (
     <DashboardLayout>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Estudiantes</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-900">Estudiantes</h1>
+          <p className="mt-2 text-slate-600">
             Registra y administra estudiantes por asignatura y sección.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Total registrados: {totalStudents}
+          <p className="mt-3 text-sm text-slate-500">
+            Total registrados: {students.length}
           </p>
         </div>
+
+        {alert && <Alert message={alert.message} type={alert.type} />}
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
           <StudentForm

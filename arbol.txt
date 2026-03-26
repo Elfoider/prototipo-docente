@@ -1,0 +1,16 @@
+type nul > src/components/ui/Toast.tsx
+type nul > src/components/ui/ToastContainer.tsx
+type nul > src/components/ui/CalendarMini.tsx
+type nul > src/components/estudiante/StudentMobileMenu.tsx
+type nul > src/components/estudiante/SubjectProgressCard.tsx
+type nul > src/components/estudiante/MiniChatPanel.tsx
+type nul > src/components/estudiante/AssignmentSubmitCard.tsx
+type nul > src/hooks/useToast.ts
+
+type nul > src/components/auth/RoleSelector.tsx
+mkdir src/components/shared
+type nul > src/components/shared/ProfileCard.tsx
+type nul > src/components/shared/NotificationPanel.tsx
+type nul > src/components/shared/AcademicFeed.tsx
+type nul > src/components/shared/TimelinePanel.tsx
+

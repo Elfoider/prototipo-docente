@@ -1,45 +1,62 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import PlanningForm from "@/components/planificacion/PlanningForm";
 import PlanningList from "@/components/planificacion/PlanningList";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import Alert from "@/components/ui/Alert";
+import { useAlert } from "@/hooks/useAlert";
+import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
+import { COLLECTIONS } from "@/lib/collections";
 import { Planning, Section, Subject } from "@/types";
 
 export default function PlanningPage() {
-  const [subjects, , subjectsLoaded] = useLocalStorage<Subject[]>("subjects", []);
-  const [sections, , sectionsLoaded] = useLocalStorage<Section[]>("sections", []);
-  const [plannings, setPlannings, planningsLoaded] = useLocalStorage<Planning[]>(
-    "plannings",
-    []
-  );
+  const { items: subjects, isLoaded: subjectsLoaded } =
+    useFirestoreCollection<Subject>(COLLECTIONS.subjects);
+
+  const { items: sections, isLoaded: sectionsLoaded } =
+    useFirestoreCollection<Section>(COLLECTIONS.sections);
+
+  const {
+    items: plannings,
+    isLoaded: planningsLoaded,
+    saveItem,
+    removeItem,
+  } = useFirestoreCollection<Planning>(COLLECTIONS.plannings);
+
   const [editingPlanning, setEditingPlanning] = useState<Planning | null>(null);
+  const { alert, showAlert } = useAlert();
 
-  const totalPlannings = useMemo(() => plannings.length, [plannings]);
+  const handleSavePlanning = async (planning: Planning) => {
+    const planningToSave: Planning = {
+      ...planning,
+      id: planning.id || crypto.randomUUID(),
+      createdAt: planning.createdAt || Date.now(),
+    };
 
-  const handleSavePlanning = (planning: Planning) => {
-    const exists = plannings.some((item) => item.id === planning.id);
+    const exists = plannings.some((item) => item.id === planningToSave.id);
 
-    if (exists) {
-      setPlannings(
-        plannings.map((item) => (item.id === planning.id ? planning : item))
-      );
-    } else {
-      setPlannings([...plannings, planning]);
-    }
+    await saveItem(planningToSave);
+
+    showAlert(
+      exists
+        ? "Planificación actualizada correctamente."
+        : "Planificación registrada correctamente.",
+      "success"
+    );
 
     setEditingPlanning(null);
   };
 
-  const handleDeletePlanning = (id: string) => {
+  const handleDeletePlanning = async (id: string) => {
     const confirmed = window.confirm(
       "¿Seguro que deseas eliminar esta planificación?"
     );
-
     if (!confirmed) return;
 
-    setPlannings(plannings.filter((item) => item.id !== id));
+    await removeItem(id);
+    showAlert("Planificación eliminada correctamente.", "info");
+
     if (editingPlanning?.id === id) {
       setEditingPlanning(null);
     }
@@ -48,7 +65,7 @@ export default function PlanningPage() {
   if (!subjectsLoaded || !sectionsLoaded || !planningsLoaded) {
     return (
       <DashboardLayout>
-        <p className="text-sm text-gray-500">Cargando planificación...</p>
+        <p className="text-sm text-slate-500">Cargando planificación...</p>
       </DashboardLayout>
     );
   }
@@ -71,16 +88,18 @@ export default function PlanningPage() {
 
   return (
     <DashboardLayout>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Planificación académica</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-900">Planificación académica</h1>
+          <p className="mt-2 text-slate-600">
             Organiza objetivos, contenidos y fechas por asignatura y sección.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Total registradas: {totalPlannings}
+          <p className="mt-3 text-sm text-slate-500">
+            Total registradas: {plannings.length}
           </p>
         </div>
+
+        {alert && <Alert message={alert.message} type={alert.type} />}
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
           <PlanningForm

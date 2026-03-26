@@ -16,6 +16,7 @@ export interface Subject {
   code: string;
   description: string;
   period: string;
+  createdAt: number;
 }
 
 export interface Section {
@@ -26,6 +27,7 @@ export interface Section {
   modality: string;
   classroom: string;
   capacity: number;
+  createdAt: number;
 }
 
 export interface Planning {
@@ -36,6 +38,7 @@ export interface Planning {
   objective: string;
   content: string;
   date: string;
+  createdAt: number;
 }
 
 export interface Evaluation {
@@ -47,6 +50,7 @@ export interface Evaluation {
   percentage: number;
   date: string;
   description: string;
+  createdAt: number;
 }
 
 export interface Student {
@@ -56,4 +60,5 @@ export interface Student {
   fullName: string;
   idNumber: string;
   email: string;
+  createdAt: number;
 }
