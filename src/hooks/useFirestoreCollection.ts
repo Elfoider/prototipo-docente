@@ -1,11 +1,10 @@
-"use client";
+"use client"
 
 import { useEffect, useState } from "react";
 import {
-  createDocument,
-  getAllDocuments,
-  removeDocument,
-  upsertDocument,
+  deleteDocument,
+  saveDocument,
+  subscribeToCollection,
 } from "@/lib/firestoreCrud";
 
 export function useFirestoreCollection<T extends { id: string }>(
@@ -15,41 +14,28 @@ export function useFirestoreCollection<T extends { id: string }>(
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const load = async () => {
-    try {
-      const data = await getAllDocuments<T>(collectionName);
-      setItems(data);
-    } catch (error) {
-      console.error(`Error cargando ${collectionName}:`, error);
-    } finally {
-      setIsLoaded(true);
-    }
-  };
-
   useEffect(() => {
-    load();
+    const unsubscribe = subscribeToCollection<T>(collectionName, (data) => {
+      setItems(data);
+      setIsLoaded(true);
+    });
+
+    return () => unsubscribe();
   }, [collectionName]);
 
   const saveItem = async (item: T) => {
     setIsSaving(true);
     try {
-      if (item.id) {
-        await upsertDocument(collectionName, item.id, item);
-      } else {
-        const newId = crypto.randomUUID();
-        await upsertDocument(collectionName, newId, { ...item, id: newId });
-      }
-      await load();
+      await saveDocument(collectionName, item.id, item);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const deleteItem = async (id: string) => {
+  const removeItem = async (id: string) => {
     setIsSaving(true);
     try {
-      await removeDocument(collectionName, id);
-      await load();
+      await deleteDocument(collectionName, id);
     } finally {
       setIsSaving(false);
     }
@@ -60,7 +46,6 @@ export function useFirestoreCollection<T extends { id: string }>(
     isLoaded,
     isSaving,
     saveItem,
-    deleteItem,
-    reload: load,
+    removeItem,
   };
 }

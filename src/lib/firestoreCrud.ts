@@ -1,31 +1,31 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
-  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
   setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export async function getAllDocuments<T>(collectionName: string): Promise<T[]> {
-  const snapshot = await getDocs(collection(db, collectionName));
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  })) as T[];
-}
-
-export async function createDocument<T extends Record<string, unknown>>(
+export function subscribeToCollection<T>(
   collectionName: string,
-  data: T
+  callback: (items: T[]) => void
 ) {
-  const { id, ...payload } = data as T & { id?: string };
-  const ref = await addDoc(collection(db, collectionName), payload);
-  return ref.id;
+  const q = query(collection(db, collectionName), orderBy("createdAt", "desc"));
+
+  return onSnapshot(q, (snapshot) => {
+    const items = snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as T[];
+
+    callback(items);
+  });
 }
 
-export async function upsertDocument<T extends Record<string, unknown>>(
+export async function saveDocument<T extends Record<string, unknown>>(
   collectionName: string,
   id: string,
   data: T
@@ -33,6 +33,6 @@ export async function upsertDocument<T extends Record<string, unknown>>(
   await setDoc(doc(db, collectionName, id), data, { merge: true });
 }
 
-export async function removeDocument(collectionName: string, id: string) {
+export async function deleteDocument(collectionName: string, id: string) {
   await deleteDoc(doc(db, collectionName, id));
 }
