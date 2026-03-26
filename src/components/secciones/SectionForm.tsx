@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Section, Subject } from "@/types";
@@ -18,6 +19,7 @@ const initialForm: Section = {
   modality: "",
   classroom: "",
   capacity: 0,
+  createdAt: Date.now(),
 };
 
 export default function SectionForm({

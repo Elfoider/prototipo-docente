@@ -2,6 +2,7 @@
 "use client";
 
 import { Subject } from "@/types";
+import { create } from "domain";
 import { FormEvent, useEffect, useState } from "react";
 
 interface SubjectFormProps {
@@ -16,6 +17,7 @@ const initialForm = {
   code: "",
   description: "",
   period: "",
+  createdAt: Date.now(),
 };
 
 export default function SubjectForm({

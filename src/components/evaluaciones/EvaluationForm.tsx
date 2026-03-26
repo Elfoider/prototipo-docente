@@ -21,6 +21,7 @@ const initialForm: Evaluation = {
   percentage: 0,
   date: "",
   description: "",
+  createdAt: Date.now(),
 };
 
 export default function EvaluationForm({

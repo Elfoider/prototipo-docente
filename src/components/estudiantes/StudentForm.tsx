@@ -19,6 +19,8 @@ const initialForm: Student = {
   fullName: "",
   idNumber: "",
   email: "",
+  createdAt: Date.now(),
+
 };
 
 export default function StudentForm({

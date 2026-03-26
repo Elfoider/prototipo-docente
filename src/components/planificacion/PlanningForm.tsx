@@ -20,6 +20,7 @@ const initialForm: Planning = {
   objective: "",
   content: "",
   date: "",
+  createdAt: Date.now(),
 };
 
 export default function PlanningForm({
